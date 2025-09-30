@@ -1,21 +1,36 @@
-import express from 'express'
-import mongoose from 'mongoose'
-import 'dotenv/config'
+import express from "express";
+import mongoose from "mongoose";
+import "dotenv/config";
 
-const app = express()
+//Models
+import Product from "./models/product.model.js";
 
+const app = express();
+app.use(express.json());
 
-mongoose.connect(process.env.CON_STRING)
-    .then(() => {
-        console.log("Connected to the Database!")
-        app.listen(3000, ()=>{
-            console.log("Server is running on port 3000")
-        })
-    })
-    .catch(() => {
-        console.log("Connection unsuccessful")
+app.get("/", (req, res) => {
+  res.send("Hello from NodeJS server API");
+});
+
+app.post("/api/products", async (req, res) => {
+  try {
+    const product = await Product.create(req.body);
+    res.send(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//Connect to mongodb
+mongoose
+  .connect(process.env.CON_STRING)
+  .then(() => {
+    console.log("Connected to the Database!");
+    //connect to the server
+    app.listen(3000, () => {
+      console.log("Server is running on port 3000");
     });
-
-app.get('/', (req, res) => {
-    res.send("Hello from NodeJS server API");
-})
+  })
+  .catch(() => {
+    console.log("Connection unsuccessful");
+  });
