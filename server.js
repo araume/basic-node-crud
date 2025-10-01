@@ -12,6 +12,7 @@ app.get('/', (req, res) => {
   res.send("Hello from NodeJS server API");
 });
 
+//Get all products
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find({});
@@ -21,10 +22,15 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+// Find product by ID
 app.get('/api/product/:id', async (req, res) => {
   try{
+    // ID Parameter
     const { id } = req.params;
     const product = await Product.findById(id);
+    if(!product){
+      return res.status(404).json({message: "Product not found"});
+    }
     res.status(200).json(product);
   }
   catch(error){
@@ -32,6 +38,7 @@ app.get('/api/product/:id', async (req, res) => {
   }
 });
 
+// Create a product in the Database
 app.post('/api/products', async (req, res) => {
   try {
     const product = await Product.create(req.body);
@@ -41,9 +48,39 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
+// Update a product in the database
+app.put('/api/product/:id', async (req, res) => {
+  try{
+    const { id } = req.params;
+    const product = await Product.findByIdAndUpdate(id, req.body);
+    if(!product){
+      return res.status(404).json({message: "Product not found"});
+    }
+    const productupdate = await Product.findById(id);
+    res.status(200).json(productupdate);
+  }
+  catch(error){
+    res.status(500).json({message: error.message});
+  }
+});
+
+// Delete a product in the database
+app.delete('/api/product/:id', async (req, res) => {
+  try{
+    const { id } = req.params;
+    const product = await Product.findByIdAndDelete(id);
+    if(!product){
+      return res.status(404).json({message: "Product not found"});
+    }
+    res.status(200).json({message: "Product deleted successfully"});
+  }
+  catch(error){
+    res.status(500).json({message: error.message});
+  }
+});
+
 //Connect to mongodb
-mongoose
-  .connect(process.env.CON_STRING)
+mongoose.connect(process.env.CON_STRING)
   .then(() => {
     console.log("Connected to the Database!");
     //connect to the server
