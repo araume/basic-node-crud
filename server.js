@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import mongoose from "mongoose";
 import "dotenv/config";
 
@@ -7,9 +7,10 @@ import Product from "./models/product.model.js";
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 app.get('/', (req, res) => {
-  res.send("Hello from NodeJS server API");
+  res.send("NodeJS server API");
 });
 
 //Get all products
