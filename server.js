@@ -6,79 +6,33 @@ import "dotenv/config";
 import Product from "./models/product.model.js";
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+
+// routes 
+import router from "./routes/product.route.js";
+app.use('/api/products', router);
 
 app.get('/', (req, res) => {
   res.send("NodeJS server API");
 });
 
 //Get all products
-app.get('/api/products', async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+app.get('/api/products', router);
 
 // Find product by ID
-app.get('/api/product/:id', async (req, res) => {
-  try{
-    // ID Parameter
-    const { id } = req.params;
-    const product = await Product.findById(id);
-    if(!product){
-      return res.status(404).json({message: "Product not found"});
-    }
-    res.status(200).json(product);
-  }
-  catch(error){
-    res.status(500).json({message: error.message});
-  }
-});
+app.get('/api/products/:id', router);
 
 // Create a product in the Database
-app.post('/api/products', async (req, res) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+app.post('/api/products', router);
 
 // Update a product in the database
-app.put('/api/product/:id', async (req, res) => {
-  try{
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body);
-    if(!product){
-      return res.status(404).json({message: "Product not found"});
-    }
-    const productupdate = await Product.findById(id);
-    res.status(200).json(productupdate);
-  }
-  catch(error){
-    res.status(500).json({message: error.message});
-  }
-});
+app.put('/api/products/:id', router);
 
 // Delete a product in the database
-app.delete('/api/product/:id', async (req, res) => {
-  try{
-    const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
-    if(!product){
-      return res.status(404).json({message: "Product not found"});
-    }
-    res.status(200).json({message: "Product deleted successfully"});
-  }
-  catch(error){
-    res.status(500).json({message: error.message});
-  }
-});
+app.delete('/api/products/:id', router);
 
 //Connect to mongodb
 mongoose.connect(process.env.CON_STRING)
